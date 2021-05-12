@@ -42,25 +42,38 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const addProduct = async (productId: number) => {
     try {
+      const balance = await getProductBalance(productId);
+
       const [alreadyExists] = cart.filter(product => product.id === productId);
       if (alreadyExists) {
-        updateProductAmount({
-          productId,
-          amount: alreadyExists.amount + 1
-        })
+        let { amount } = alreadyExists;
+        amount += 1;
+        if (amount > balance) {
+          throw new Error('Quantidade solicitada fora de estoque')
+        } else {
+          updateProductAmount({
+            productId,
+            amount,
+          })
+        }
+        return;
       }
 
+      if (balance < 1) {
+        throw new Error('Quantidade solicitada fora de estoque')
+      }
       const response = await api.get<Product[]>(`/products?id=${productId}`)
       const product = response.data[0];
-      console.log('received', product)
       product.amount = 1;
 
       setCart([
         ...cart,
         product
       ])
-    } catch {
-      // TODO
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      }
     }
   };
 
