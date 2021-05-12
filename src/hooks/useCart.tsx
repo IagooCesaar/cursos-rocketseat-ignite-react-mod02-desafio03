@@ -30,9 +30,14 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     return [];
   });
 
+  function updateStorage() {
+    localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
+  }
+
   const addProduct = async (productId: number) => {
     try {
       // TODO
+      updateStorage();
     } catch {
       // TODO
     }
@@ -41,6 +46,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
   const removeProduct = (productId: number) => {
     try {
       // TODO
+      updateStorage();
     } catch {
       // TODO
     }
