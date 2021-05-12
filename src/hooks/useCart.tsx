@@ -73,6 +73,8 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)
+      } else {
+        toast.error("Erro na adição do produto")
       }
     }
   };
