@@ -93,15 +93,24 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     amount,
   }: UpdateProductAmount) => {
     try {
-      const newCart = cart.map(product => {
-        if (product.id === productId) {
-          product.amount = amount;
-        }
-        return product;
-      })
-      setCart(newCart)
-    } catch {
-      // TODO
+      const balance = await getProductBalance(productId);
+      if (amount > balance) {
+        throw new Error('Quantidade solicitada fora de estoque')
+      } else {
+        const newCart = cart.map(product => {
+          if (product.id === productId) {
+            product.amount = amount;
+          }
+          return product;
+        })
+        setCart(newCart)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error("Erro na alteração de quantidade do produto")
+      }
     }
   };
 
