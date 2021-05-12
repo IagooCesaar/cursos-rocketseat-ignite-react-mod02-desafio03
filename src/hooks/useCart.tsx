@@ -36,6 +36,14 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const addProduct = async (productId: number) => {
     try {
+      const [alreadyExists] = cart.filter(product => product.id === productId);
+      if (alreadyExists) {
+        updateProductAmount({
+          productId,
+          amount: alreadyExists.amount + 1
+        })
+      }
+
       const response = await api.get<Product[]>(`/products?id=${productId}`)
       const product = response.data[0];
       console.log('received', product)
