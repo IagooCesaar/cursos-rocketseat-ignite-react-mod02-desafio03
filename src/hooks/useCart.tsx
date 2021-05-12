@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '../services/api';
 import { Product, Stock } from '../types';
@@ -30,14 +30,21 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     return [];
   });
 
-  function updateStorage() {
+  useEffect(() => {
     localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
-  }
+  }, [cart])
 
   const addProduct = async (productId: number) => {
     try {
-      // TODO
-      updateStorage();
+      const response = await api.get<Product[]>(`/products?id=${productId}`)
+      const product = response.data[0];
+      console.log('received', product)
+      product.amount = 1;
+
+      setCart([
+        ...cart,
+        product
+      ])
     } catch {
       // TODO
     }
@@ -46,7 +53,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
   const removeProduct = (productId: number) => {
     try {
       // TODO
-      updateStorage();
     } catch {
       // TODO
     }
