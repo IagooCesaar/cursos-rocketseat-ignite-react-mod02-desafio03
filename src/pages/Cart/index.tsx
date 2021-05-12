@@ -18,6 +18,7 @@ interface Product {
 
 interface CartFormatted extends Product {
   priceFormatted: string;
+  totalFormatted: string;
 }
 
 const Cart = (): JSX.Element => {
@@ -25,7 +26,8 @@ const Cart = (): JSX.Element => {
 
   const cartFormatted = cart.map(product => ({
     ...product,
-    priceFormatted: formatPrice(product.price)
+    priceFormatted: formatPrice(product.price),
+    totalFormatted: formatPrice(product.price * product.amount),
   } as CartFormatted));
 
   const total = formatPrice(cart.reduce((sumTotal, product) => {
@@ -92,7 +94,7 @@ const Cart = (): JSX.Element => {
                 </div>
               </td>
               <td>
-                <strong>R$ 359,80</strong>
+                <strong>{product.totalFormatted}</strong>
               </td>
               <td>
                 <button
