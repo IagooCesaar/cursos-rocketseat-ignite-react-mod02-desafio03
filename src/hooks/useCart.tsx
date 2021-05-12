@@ -34,6 +34,12 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
   }, [cart])
 
+  async function getProductBalance(productId: number) {
+    const stockResponse = await api.get<Stock[]>(`/stock?id=${productId}`)
+    const { amount: balance } = stockResponse.data[0];
+    return balance;
+  }
+
   const addProduct = async (productId: number) => {
     try {
       const [alreadyExists] = cart.filter(product => product.id === productId);
