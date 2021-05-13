@@ -30,9 +30,13 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     return [];
   });
 
-  useEffect(() => {
-    localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
-  }, [cart])
+  // useEffect(() => {
+  //   localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
+  // }, [cart])
+
+  function updateLocalStorage(newCart: Product[]) {
+    localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart))
+  }
 
   async function getProductBalance(productId: number) {
     const stockResponse = await api.get<Stock[]>(`/stock?id=${productId}`)
@@ -66,10 +70,14 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const product = response.data[0];
       product.amount = 1;
 
-      setCart([
-        ...cart,
-        product
-      ])
+      setCart(oldState => {
+        const newCart = [
+          ...cart,
+          product
+        ];
+        updateLocalStorage(newCart);
+        return newCart;
+      })
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)
@@ -82,7 +90,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
   const removeProduct = (productId: number) => {
     try {
       const remainingProduct = cart.filter(product => product.id !== productId)
-      setCart(remainingProduct)
+      setCart(oldState => {
+        updateLocalStorage(remainingProduct);
+        return remainingProduct;
+      })
     } catch {
       toast.error("Erro na remoção do produto")
     }
@@ -103,7 +114,11 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           }
           return product;
         })
-        setCart(newCart)
+        setCart(oldState => {
+          updateLocalStorage(newCart);
+          return newCart;
+        })
+
       }
     } catch (error) {
       if (error instanceof Error) {
