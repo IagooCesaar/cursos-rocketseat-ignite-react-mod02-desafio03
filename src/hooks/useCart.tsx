@@ -93,6 +93,14 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     amount,
   }: UpdateProductAmount) => {
     try {
+      if (amount <= 0) {
+        throw new Error('Quantidade solicitada é inválida')
+      }
+      const productInCart = cart.filter(product => product.id === productId);
+      if (!productInCart) {
+        throw new Error('O produto informado não está no carrinho')
+      }
+
       const balance = await getProductBalance(productId);
       if (amount > balance) {
         throw new Error('Quantidade solicitada fora de estoque')
